@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from "react";
-import { ScrollView, View, StyleSheet, FlatList } from "react-native";
-import { Card, Button, Text, Avatar, Input, Header } from "react-native-elements";
-import PostCard from "../components/PostCard";
-import { AntDesign, Entypo } from "@expo/vector-icons";
+
+import React, { useState } from "react";
+import { View, StyleSheet, AsyncStorage } from "react-native";
+import { Text, Card, Button, Avatar, Header } from "react-native-elements";
 import { AuthContext } from "../provider/AuthProvider";
 
-const Home = (props) => {
+
+const Profile = (props) => {
     return (
         <AuthContext.Consumer>
             {(auth) => (
@@ -18,7 +18,7 @@ const Home = (props) => {
                                 props.navigation.toggleDrawer();
                             },
                         }}
-                        centerComponent={{ text: auth.CurrentUser.name, style: { color: "#fff" } }}
+                        centerComponent={{ text: "The Office", style: { color: "#fff" } }}
                         rightComponent={{
                             icon: "lock-outline",
                             color: "#fff",
@@ -29,18 +29,22 @@ const Home = (props) => {
                         }}
                     />
                     <Card>
-                        <Input
-                            placeholder="What's On Your Mind?"
-                            leftIcon={<Entypo name="pencil" size={24} color="black" />}
-                        />
-                        <Button title="Post" type="outline" onPress={function () { }} />
+                        <View style={{ flexDirection: "row", alignItems: "center" }}>
+                            <Avatar
+                                containerStyle={{ backgroundColor: "cyan" }}
+                                rounded
+                                icon={{
+                                    name: "thumbs-o-up",
+                                    type: "font-awesome",
+                                    color: "black",
+                                }}
+                                activeOpacity={1}
+                            />
+                            <Text style={{ paddingHorizontal: 10 }}>
+                                {auth.CurrentUser.name} Liked Your Post.
+              </Text>
+                        </View>
                     </Card>
-
-                    <PostCard
-                        author="Tasnim Ahmed"
-                        title="Hello World"
-                        body="This is my First Post!"
-                    />
                 </View>
             )}
         </AuthContext.Consumer>
@@ -57,4 +61,4 @@ const styles = StyleSheet.create({
     },
 });
 
-export default Home;
+export default Profile;

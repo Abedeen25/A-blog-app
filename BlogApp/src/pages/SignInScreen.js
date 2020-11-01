@@ -70,7 +70,7 @@ const style = StyleSheet.create({
     viewStyle: {
         flex: 1,
         justifyContent: 'center',
-        backgroundColor: '#38869B'
+        backgroundColor: '#007AFF'
     }
 });
 
