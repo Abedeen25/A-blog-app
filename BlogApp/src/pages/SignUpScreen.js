@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
 import { View, StyleSheet } from 'react-native';
 import { Input, Button, Card } from 'react-native-elements';
-import { Feather, MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
+import { Feather, MaterialCommunityIcons, MaterialIcons, Ionicons, Entypo, Octicons } from '@expo/vector-icons';
 
 import { storeDataJSON } from '../functions/AsyncStorageFunctions';
 
 const SignUpScreen = (props) => {
     const [Name, setName] = useState("");
-    const [SID, setSID] = useState("");
+    const [DoB, setDoB] = useState("");
+    const [Address, setAddress] = useState("");
+    const [WorkPlace, setWorkPlace] = useState("");
     const [Mail, setMail] = useState("");
     const [Pass, setPass] = useState("");
 
@@ -26,10 +28,26 @@ const SignUpScreen = (props) => {
                 />
 
                 <Input
-                    rightIcon={<MaterialCommunityIcons name="music-accidental-sharp" size={24} color="black" />}
-                    placeholder='Student ID'
+                    rightIcon={<MaterialIcons name="date-range" size={24} color="black" />}
+                    placeholder='Birth Day (DD.MM.YYYY)'
                     onChangeText={function (currentInput) {
-                        setSID(currentInput);
+                        setDoB(currentInput);
+                    }}
+                />
+
+                <Input
+                    rightIcon={<Entypo name="location" size={24} color="black" />}
+                    placeholder='Address'
+                    onChangeText={function (currentInput) {
+                        setAddress(currentInput);
+                    }}
+                />
+
+                <Input
+                    rightIcon={<Octicons name="organization" size={24} color="black" />}
+                    placeholder='Workplace'
+                    onChangeText={function (currentInput) {
+                        setWorkPlace(currentInput);
                     }}
                 />
 
@@ -57,7 +75,9 @@ const SignUpScreen = (props) => {
                     onPress={function () {
                         let currentUser = {
                             name: Name,
-                            sid: SID,
+                            dateOfBirth: DoB,
+                            address: Address,
+                            workPlace: WorkPlace,
                             email: Mail,
                             password: Pass,
                         };

@@ -2,18 +2,33 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from "@react-navigation/stack";
 import { createMaterialBottomTabNavigator } from '@react-navigation/material-bottom-tabs';
+import { createDrawerNavigator } from '@react-navigation/drawer';
 import { AntDesign, Ionicons, MaterialIcons } from '@expo/vector-icons';
 
 import Home from "./src/pages/Home";
 import NotificationPage from "./src/pages/NotificationPage"
+import Profile from "./src/pages/Profile"
+
 import SignUpScreen from "./src/pages/SignUpScreen";
 import SignInScreen from "./src/pages/SignInScreen";
 import { AuthContext, AuthProvider } from './src/provider/AuthProvider';
 
 
-const HomeStack = createStackNavigator();
+
 const AuthStack = createStackNavigator();
 const HomeTab = createMaterialBottomTabNavigator();
+const AppDrawer = createDrawerNavigator();
+
+
+const AppDrawerScreen = () => {
+  return (
+    <AppDrawer.Navigator>
+      <AppDrawer.Screen name="Home" component={HomeTabs} />
+      <AppDrawer.Screen name="Profile" component={Profile} />
+    </AppDrawer.Navigator>
+  );
+}
+
 
 
 const HomeTabs = () => {
@@ -57,7 +72,7 @@ function App() {
     <AuthProvider>
       <AuthContext.Consumer>
         {(auth) => (<NavigationContainer>
-          {auth.IsLoggedIn ? <HomeTabs /> : <AuthStackScreen />}
+          {auth.IsLoggedIn ? <AppDrawerScreen /> : <AuthStackScreen />}
         </NavigationContainer>)}
       </AuthContext.Consumer>
     </AuthProvider>
