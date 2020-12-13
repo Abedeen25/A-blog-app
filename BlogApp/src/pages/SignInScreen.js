@@ -6,65 +6,72 @@ import { AuthContext } from '../provider/AuthProvider';
 import { getDataJson } from '../functions/AsyncstorageFunction';
 import { AsyncStorage } from 'react-native';
 import * as firebase from "firebase";
+import Loading from "../components/Loading";
 
 
 const SigninScreen = (props) => {
     const [Email, setEmail] = useState("");
     const [Password, setPassword] = useState("");
+    const [isLoading, setIsLoading] = useState(false);
 
-    return (
-        <AuthContext.Consumer>
-            {(auth) => (
-                <SafeAreaView style={styles.viewStyle}>
-                    <ImageBackground source={require('./../../assets/BG1.jpg')} style={styles.imageStyle}>
-                        <Card>
-                            <Card.Title style={styles.textStyle}>Start Blogging!</Card.Title>
-                            <Card.Divider />
-                            <Input
-                                leftIcon={<Feather name="mail" size={24} color="gray" />}
-                                placeholder='Email'
-                                onChangeText={
-                                    function (currentinput) {
-                                        setEmail(currentinput);
+    if (isLoading) { return (<Loading />) }
+    else {
+        return (
+            <AuthContext.Consumer>
+                {(auth) => (
+                    <SafeAreaView style={styles.viewStyle}>
+                        <ImageBackground source={require('./../../assets/BG1.jpg')} style={styles.imageStyle}>
+                            <Card>
+                                <Card.Title style={styles.textStyle}>Start Blogging!</Card.Title>
+                                <Card.Divider />
+                                <Input
+                                    leftIcon={<Feather name="mail" size={24} color="gray" />}
+                                    placeholder='Email'
+                                    onChangeText={
+                                        function (currentinput) {
+                                            setEmail(currentinput);
+                                        }
+                                    }></Input>
+                                <Input
+                                    leftIcon={<Feather name="key" size={24} color="gray" />}
+                                    placeholder='Password'
+                                    secureTextEntry={true}
+                                    onChangeText={
+                                        function (currentinput) {
+                                            setPassword(currentinput);
+                                        }
+                                    }></Input>
+                                <Button
+                                    icon={<FontAwesome name="sign-in" size={24} color="white" />}
+                                    title="  Sign In"
+                                    type="solid"
+                                    onPress={() => {
+                                        setIsLoading(true)
+                                        firebase
+                                            .auth()
+                                            .signInWithEmailAndPassword(Email, Password)
+                                            .then((userCreds) => {
+                                                setIsLoading(false)
+                                                auth.setIsloggedIn(true);
+                                                auth.setCurrentUser(userCreds.user);
+                                                console.log(userCreds.user)
+                                            })
+                                            .catch((error) => {
+                                                setIsLoading(false)
+                                                alert(error);
+                                            });
+                                    }}
+                                />
+                                <Button
+                                    title=" Don't have an Account"
+                                    type="clear"
+                                    onPress={
+                                        function () {
+                                            props.navigation.navigate('SignUp')
+                                        }
                                     }
-                                }></Input>
-                            <Input
-                                leftIcon={<Feather name="key" size={24} color="gray" />}
-                                placeholder='Password'
-                                secureTextEntry={true}
-                                onChangeText={
-                                    function (currentinput) {
-                                        setPassword(currentinput);
-                                    }
-                                }></Input>
-                            <Button
-                                icon={<FontAwesome name="sign-in" size={24} color="white" />}
-                                title="  Sign In"
-                                type="solid"
-                                onPress={() => {
-                                    firebase
-                                        .auth()
-                                        .signInWithEmailAndPassword(Email, Password)
-                                        .then((userCreds) => {
-                                            auth.setIsloggedIn(true);
-                                            auth.setCurrentUser(userCreds.user);
-                                            console.log(userCreds.user)
-                                        })
-                                        .catch((error) => {
-                                            alert(error);
-                                        });
-                                }}
-                            />
-                            <Button
-                                title=" Don't have an Account"
-                                type="clear"
-                                onPress={
-                                    function () {
-                                        props.navigation.navigate('SignUp')
-                                    }
-                                }
-                            />
-                            {/* <Button
+                                />
+                                {/* <Button
                                 title="erase"
                                 type="clear"
                                 onPress={
@@ -78,12 +85,13 @@ const SigninScreen = (props) => {
                                     }
                                 }
                             /> */}
-                        </Card>
-                    </ImageBackground>
-                </SafeAreaView>
-            )}
-        </AuthContext.Consumer>
-    )
+                            </Card>
+                        </ImageBackground>
+                    </SafeAreaView>
+                )}
+            </AuthContext.Consumer>
+        )
+    }
 }
 
 const styles = StyleSheet.create({
