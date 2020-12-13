@@ -10,8 +10,8 @@ import 'firebase/firestore';
 const WritePostComponent = (props) => {
     const [Post, setPost] = useState("");
     const input = React.createRef();
-    let today = new Date().toLocaleDateString();
-    let currenttime = new Date().toLocaleTimeString();
+    const [IsLoading, setIsLoading] = useState(false)
+
     return (
         <Card>
             <Input
@@ -24,9 +24,10 @@ const WritePostComponent = (props) => {
                     }
                 }
             />
-            <Button title="Post" type="outline" onPress={
+            {IsLoading ? <ActivityIndicator size="large" color="#20C6DC" animating={true} /> : <Button title="Post" type="outline" onPress={
                 function () {
                     if (Post) {
+                        setIsLoading(true)
                         firebase.firestore().collection("posts").add({
                             userId: props.user.uid,
                             post: Post,
@@ -35,8 +36,10 @@ const WritePostComponent = (props) => {
                             likes: [],
                             comments: []
                         }).then((obj) => {
+                            setIsLoading(false)
                             alert("Post ID: " + obj.ZE.path.segments[1])
                         }).catch((error) => {
+                            setIsLoading(false)
                             alert(error)
                         })
                     } else {
@@ -60,8 +63,7 @@ const WritePostComponent = (props) => {
                     // } else {
                     //     alert("Must enter any character");
                     // }
-                }
-            } />
+                }} />}
         </Card>
     );
 };

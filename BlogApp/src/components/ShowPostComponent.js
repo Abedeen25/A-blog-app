@@ -6,8 +6,8 @@ import { storeDataJson, mergeData, removeData } from '../functions/AsyncstorageF
 import { AntDesign } from "@expo/vector-icons";
 
 const ShowPostComponent = (props) => {
-  const [Like, setLike] = useState(props.title.likecount);
-  let like = " (" + props.title.likecount + ")";
+  const [Like, setLike] = useState(props.data.likes.length);
+  let like = " (" + Like + ")";
   const comment = "Comment";
   let today = new Date().toLocaleDateString();
   let currenttime = new Date().toLocaleTimeString();
@@ -27,7 +27,7 @@ const ShowPostComponent = (props) => {
           activeOpacity={1}
         />
         <Text h4Style={{ padding: 10 }} h4>
-          {props.title.uname}
+          {props.data.author}
         </Text>
       </View>
       <Text h6Style={{ padding: 10 }} h6 style={{ alignSelf: "stretch", color: 'gray' }}>

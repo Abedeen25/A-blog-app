@@ -6,6 +6,8 @@ import WritePostComponent from "../components/WritePostComponent";
 import { getDataJson, getAllindex } from '../functions/AsyncstorageFunction';
 import { AuthContext } from "../provider/AuthProvider"
 import HeaderHome from "../components/HeaderComponent";
+import * as firebase from "firebase";
+import 'firebase/firestore';
 
 
 
@@ -14,28 +16,18 @@ const HomeScreen = (props) => {
   const [Post, setPost] = useState([]);
   const [Render, setRender] = useState(false);
 
-
-  const getPost = async () => {
+  const loadPosts = () => {
     setRender(true);
-    let keys = await getAllindex();
-    let Allposts = [];
-    if (keys != null) {
-      for (let k of keys) {
-        if (k.startsWith("pid#")) {
-          let post = await getDataJson(k);
-          Allposts.push(post);
-        }
-      }
-      setPost(Allposts);
-    }
-    else {
-      console.log("No post to show");
-    }
+    firebase.firestore().collection("posts").get().then(function (querySnapshot) {
+      querySnapshot.forEach(function (doc) {
+        console.log(doc.id, " => ", doc.data());
+      });
+    });
     setRender(false);
-  }
+  };
 
   useEffect(() => {
-    getPost();
+    loadPosts();
   }, []);
 
   return (
@@ -47,7 +39,6 @@ const HomeScreen = (props) => {
             user={auth.CurrentUser.displayName}
             DrawerFunction={() => {
               props.navigation.toggleDrawer();
-              console.log(auth.CurrentUser)
             }}
           />
 
@@ -57,15 +48,15 @@ const HomeScreen = (props) => {
 
             <FlatList
               data={Post}
-              onRefresh={getPost}
+              onRefresh={loadPosts}
               refreshing={Render}
               renderItem={function ({ item }) {
                 return (
-                  <ShowPostComponent title={item} user={auth.CurrentUser} link={props.navigation}
-                  />
+                  // <ShowPostComponent postBody={item} />
+                  <View><Text>Some message</Text></View>
                 );
               }}
-              keyExtractor={(item, index) => index.toString()}
+            // keyExtractor={(item, index) => index.toString()}
             >
             </FlatList>
 
