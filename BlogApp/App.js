@@ -9,11 +9,24 @@ import { AntDesign, MaterialIcons } from "@expo/vector-icons";
 
 import HomeScreen from './src/pages/HomeScreen';
 import NotificationScreen from './src/pages/NotificationScreen';
-import SignupScreen from './src/pages/SignupScreen';
-import SigninScreen from './src/pages/SigninScreen';
+import SignupScreen from './src/pages/SignUpScreen';
+import SigninScreen from './src/pages/SignInScreen';
 import ProfileScreen from './src/pages/ProfileScreen';
 import CommentScreen from './src/pages/CommentScreen';
 import EditProfileScreen from './src/pages/EditProfileScreen';
+import * as firebase from "firebase";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyDpudOdQMUBpwjIUQTfWy0FbnxXcHj2Ha0",
+  authDomain: "blog-app-e7e73.firebaseapp.com",
+  projectId: "blog-app-e7e73",
+  storageBucket: "blog-app-e7e73.appspot.com",
+  messagingSenderId: "512802133010",
+  appId: "1:512802133010:web:fc47a745ca4ac63e33b4cb"
+};
+// Initialize Firebase
+if (!firebase.apps.length)
+  firebase.initializeApp(firebaseConfig);
 
 const AuthStack = createStackNavigator();
 const HomeTab = createMaterialBottomTabNavigator();

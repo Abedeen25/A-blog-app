@@ -42,9 +42,10 @@ const HomeScreen = (props) => {
         <SafeAreaView style={styles.viewStyle}>
 
           <HeaderHome
-            user={auth.CurrentUser.name}
+            user={auth.CurrentUser.displayName}
             DrawerFunction={() => {
               props.navigation.toggleDrawer();
+              console.log(auth.CurrentUser)
             }}
           />
 

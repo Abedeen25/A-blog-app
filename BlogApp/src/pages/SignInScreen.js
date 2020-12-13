@@ -5,6 +5,7 @@ import { Fontisto, Feather, FontAwesome } from '@expo/vector-icons';
 import { AuthContext } from '../provider/AuthProvider';
 import { getDataJson } from '../functions/AsyncstorageFunction';
 import { AsyncStorage } from 'react-native';
+import * as firebase from "firebase";
 
 
 const SigninScreen = (props) => {
@@ -40,16 +41,18 @@ const SigninScreen = (props) => {
                                 icon={<FontAwesome name="sign-in" size={24} color="white" />}
                                 title="  Sign In"
                                 type="solid"
-                                onPress={async function () {
-                                    let UserData = await getDataJson(Email);
-                                    if (UserData.password == Password) {
-                                        auth.setIsloggedIn(true);
-                                        auth.setCurrentUser(UserData);
-                                    }
-                                    else {
-                                        alert("Oops! Something went wrong :(")
-                                        console.log(userData)
-                                    }
+                                onPress={() => {
+                                    firebase
+                                        .auth()
+                                        .signInWithEmailAndPassword(Email, Password)
+                                        .then((userCreds) => {
+                                            auth.setIsloggedIn(true);
+                                            auth.setCurrentUser(userCreds.user);
+                                            console.log(userCreds.user)
+                                        })
+                                        .catch((error) => {
+                                            alert(error);
+                                        });
                                 }}
                             />
                             <Button
