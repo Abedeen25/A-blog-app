@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { ImageBackground, SafeAreaView, FlatList, StyleSheet } from "react-native";
+import { ImageBackground, SafeAreaView, FlatList, StyleSheet, ActivityIndicator, Text } from "react-native";
 import { Header } from "react-native-elements";
 import ShowPostComponent from "../components/ShowPostComponent";
 import WritePostComponent from "../components/WritePostComponent";
@@ -8,6 +8,7 @@ import { AuthContext } from "../provider/AuthProvider"
 import HeaderHome from "../components/HeaderComponent";
 import * as firebase from "firebase";
 import 'firebase/firestore';
+import { View } from "react-native";
 
 
 
@@ -15,15 +16,47 @@ const HomeScreen = (props) => {
 
   const [Post, setPost] = useState([]);
   const [Render, setRender] = useState(false);
+  const [IsLoading, setIsLoading] = useState(false);
 
-  const loadPosts = () => {
-    setRender(true);
-    firebase.firestore().collection("posts").get().then(function (querySnapshot) {
-      querySnapshot.forEach(function (doc) {
-        console.log(doc.id, " => ", doc.data());
+  // const loadPosts = () => {
+  //   setIsLoading(true);
+  //   firebase.firestore().collection("posts").orderBy("posted_at", "desc").onSnapsho(function (querySnapshot) {
+  //     let temp_loader = [];
+  //     querySnapshot.forEach(function (doc) {
+  //       temp_loader.push({
+  //         id: doc.id,
+  //         data: doc.data(),
+  //       })
+  //     });
+  //     setPost(temp_loader);
+  //     setIsLoading(false);
+  //   }).catch((error) => {
+  //     setIsLoading(false);
+  //     alert(error);
+  //   })
+  // };
+
+  const loadPosts = async () => {
+    setIsLoading(true);
+    firebase
+      .firestore()
+      .collection("posts")
+      .orderBy("posted_at", "desc")
+      .onSnapshot((querySnapshot) => {
+        let temp_posts = [];
+        querySnapshot.forEach((doc) => {
+          temp_posts.push({
+            id: doc.id,
+            data: doc.data(),
+          });
+        });
+        setPost(temp_posts);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        alert(error);
       });
-    });
-    setRender(false);
   };
 
   useEffect(() => {
@@ -46,19 +79,18 @@ const HomeScreen = (props) => {
 
             <WritePostComponent user={auth.CurrentUser} />
 
-            <FlatList
+            {IsLoading ? <ActivityIndicator size="large" color="#20C6DC" animating={true} /> : <FlatList
               data={Post}
               onRefresh={loadPosts}
               refreshing={Render}
               renderItem={function ({ item }) {
                 return (
-                  // <ShowPostComponent postBody={item} />
-                  <View><Text>Some message</Text></View>
+                  <ShowPostComponent postBody={item} />
                 );
               }}
             // keyExtractor={(item, index) => index.toString()}
-            >
-            </FlatList>
+            />
+            }
 
           </ImageBackground>
 
