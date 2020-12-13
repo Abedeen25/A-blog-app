@@ -13,6 +13,8 @@ const HomeScreen = (props) => {
 
   const [Post, setPost] = useState([]);
   const [Render, setRender] = useState(false);
+
+
   const getPost = async () => {
     setRender(true);
     let keys = await getAllindex();
