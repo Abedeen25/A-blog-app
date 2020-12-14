@@ -14,35 +14,27 @@ import ShowCommentComponent from "../components/ShowCommentComponent";
 import { getDataJson, getAllindex } from '../functions/AsyncstorageFunction';
 import { AuthContext } from "../provider/AuthProvider"
 import HeaderHome from "../components/HeaderComponent";
+import * as firebase from "firebase";
+import 'firebase/firestore';
 
 
 const CommentScreen = (props) => {
   const content = props.route.params.content;
-  console.log(content)
+  // console.log(content)
 
   const [Comment, setComment] = useState([]);
   const [Render, setRender] = useState(false);
-  const getComment = async () => {
-    setRender(true);
-    let keys = await getAllindex();
-    let Allcomments = [];
-    if (keys != null) {
-      for (let k of keys) {
-        if (k.startsWith("cid#") && k.endsWith(content.pid)) {
-          let comments = await getDataJson(k);
-          Allcomments.push(comments);
-        }
-      }
-      setComment(Allcomments);
-    }
-    else {
-      console.log("No post to show");
-    }
-    setRender(false);
+
+  const CommentReaload = () => {
+    firebase.firestore().collection("posts").doc(content.id).onSnapshot(function (doc) {
+      let temp_body = doc.data();
+      setComment(temp_body.comments.reverse())
+
+    });
   }
 
   useEffect(() => {
-    getComment();
+    CommentReaload();
   }, []);
 
   return (
@@ -51,7 +43,7 @@ const CommentScreen = (props) => {
         <SafeAreaView style={styles.viewStyle}>
 
           <HeaderHome
-            user={auth.CurrentUser.name}
+            user={auth.CurrentUser.displayName}
             DrawerFunction={() => {
               props.navigation.toggleDrawer();
             }}
@@ -63,11 +55,11 @@ const CommentScreen = (props) => {
 
             <FlatList
               data={Comment}
-              onRefresh={getComment}
+              onRefresh={CommentReaload}
               refreshing={Render}
               renderItem={function ({ item }) {
                 return (
-                  <ShowCommentComponent title={item}
+                  <ShowCommentComponent com={item}
                   />
                 );
               }}

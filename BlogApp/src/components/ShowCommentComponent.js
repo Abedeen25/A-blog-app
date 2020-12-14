@@ -13,7 +13,7 @@ const ShowCommentComponent = (props) => {
         }}
       >
         <Text h4Style={{ padding: 10, paddingLeft: 0 }} h4>
-          {props.title.uname}
+          {props.com.commentor}
         </Text>
       </View>
       <Text
@@ -21,11 +21,11 @@ const ShowCommentComponent = (props) => {
           paddingVertical: 10,
         }}
       >
-        {props.title.comment}
+        {props.com.message}
       </Text>
       <Text h6Style={{ padding: 10 }} h6
         style={{ alignSelf: "flex-end", color: 'gray' }}>
-        {props.title.time}, {props.title.date}
+        {props.com.time.toDate().toDateString().toString()}
       </Text>
     </Card>
   );
