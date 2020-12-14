@@ -1,36 +1,46 @@
 import React, { useState, useEffect } from "react";
 import { ImageBackground, FlatList, View, StyleSheet } from "react-native";
-import { Header } from "react-native-elements";
+import { Card, Text } from "react-native-elements";
 import { getDataJson, getAllindex } from '../functions/AsyncstorageFunction';
 import NotificationComponent from '../components/NotificationComponent';
 import { AuthContext } from "../provider/AuthProvider"
 import HeaderHome from "../components/HeaderComponent";
+import * as firebase from "firebase";
+import 'firebase/firestore';
 
 const NotificationScreen = (props) => {
-  const [Notification, setNotification] = useState([]);
+
+  const [Post, setPost] = useState([]);
   const [Render, setRender] = useState(false);
-  const getNotification = async () => {
-    setRender(true);
-    let keys = await getAllindex();
-    let Allnotifications = [];
-    if (keys != null) {
-      for (let k of keys) {
-        if (k.startsWith("nid#")) {
-          let notification = await getDataJson(k);
-          Allnotifications.push(notification);
-        }
-      }
-      setNotification(Allnotifications);
-    }
-    else {
-      console.log("No post to show");
-    }
-    setRender(false);
-  }
+  const [IsLoading, setIsLoading] = useState(false);
+
+
+  const loadPosts = async () => {
+    setIsLoading(true);
+    firebase
+      .firestore()
+      .collection("posts")
+      .orderBy("posted_at", "desc")
+      .onSnapshot((querySnapshot) => {
+        let temp_posts = [];
+        querySnapshot.forEach((doc) => {
+          temp_posts.push({
+            id: doc.id,
+            data: doc.data(),
+          });
+        });
+        setPost(temp_posts);
+        setIsLoading(false);
+      })
+      .catch((error) => {
+        setIsLoading(false);
+        alert(error);
+      });
+  };
 
 
   useEffect(() => {
-    getNotification();
+    loadPosts();
   }, []);
 
   return (
@@ -38,20 +48,21 @@ const NotificationScreen = (props) => {
       {(auth) => (
         <View style={styles.viewStyle}>
           <HeaderHome
-            user={auth.CurrentUser.name}
+            user={auth.CurrentUser.displayName}
             DrawerFunction={() => {
               props.navigation.toggleDrawer();
             }}
           />
           <ImageBackground source={require('./../../assets/BG1.jpg')} style={styles.imageStyle}>
             <FlatList
-              data={Notification}
-              onRefresh={getNotification}
+              data={Post}
+              onRefresh={loadPosts}
               refreshing={Render}
               renderItem={function ({ item }) {
-                if (item.author == auth.CurrentUser.name) {
+                if (item.data.userId == auth.CurrentUser.uid) {
                   return (
-                    <NotificationComponent title={item} link={props.navigation} />
+                    <NotificationComponent post={item} link={props.navigation} />
+
                   );
                 }
               }}
