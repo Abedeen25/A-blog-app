@@ -4,14 +4,15 @@ import { View } from "react-native";
 import { Card, Button, Text, Avatar } from "react-native-elements";
 import { storeDataJson, mergeData, removeData } from '../functions/AsyncstorageFunction';
 import { AntDesign } from "@expo/vector-icons";
+import * as firebase from "firebase";
+import 'firebase/firestore';
 
 const ShowPostComponent = (props) => {
-  console.log(props)
   const [Like, setLike] = useState(props.postBody.data.likes.length);
   let like = " (" + Like + ")";
   const comment = "Comment";
-  let today = new Date().toLocaleDateString();
-  let currenttime = new Date().toLocaleTimeString();
+  // console.log(props.postBody)
+  // console.log(props.LocalUser)
 
   return (
     <Card>
@@ -48,29 +49,16 @@ const ShowPostComponent = (props) => {
           title={like}
           icon={<AntDesign name="heart" size={24} color="dodgerblue" />}
           onPress={
-            async function () {
-              // let lcount = (Like + 1)
-              // await mergeData(props.title.pid, JSON.stringify({ likecount: lcount }))
-              // const id = Math.ceil(Math.random() * 1000000000000000);
-              // let newnotification = {
-              //   pid: props.title.pid,
-              //   nid: "nid#" + id + props.title.pid,
-              //   author: props.title.uname,
-              //   uname: props.user.name,
-              //   date: today,
-              //   time: currenttime,
-              //   type: "like",
-              // }
-              // storeDataJson("nid#" + id + props.title.pid, newnotification);
-              // console.log(newnotification);
-              // console.log(props.title);
-              // setLike(Like + 1);
+            function () {
+              firebase.firestore().collection("posts").doc(props.postBody.id).update({
+                likes: firebase.firestore.FieldValue.arrayUnion(props.LocalUser)
+              });
             }
           }
         />
         <Button type="solid" title={comment} onPress={
           function () {
-            // props.link.navigate('Comment', { content: props.title });
+            props.nav.navigation.navigate('Comment', { content: props.postBody });
           }
         } />
 

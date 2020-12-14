@@ -18,6 +18,7 @@ import HeaderHome from "../components/HeaderComponent";
 
 const CommentScreen = (props) => {
   const content = props.route.params.content;
+  console.log(content)
 
   const [Comment, setComment] = useState([]);
   const [Render, setRender] = useState(false);

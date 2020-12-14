@@ -18,24 +18,6 @@ const HomeScreen = (props) => {
   const [Render, setRender] = useState(false);
   const [IsLoading, setIsLoading] = useState(false);
 
-  // const loadPosts = () => {
-  //   setIsLoading(true);
-  //   firebase.firestore().collection("posts").orderBy("posted_at", "desc").onSnapsho(function (querySnapshot) {
-  //     let temp_loader = [];
-  //     querySnapshot.forEach(function (doc) {
-  //       temp_loader.push({
-  //         id: doc.id,
-  //         data: doc.data(),
-  //       })
-  //     });
-  //     setPost(temp_loader);
-  //     setIsLoading(false);
-  //   }).catch((error) => {
-  //     setIsLoading(false);
-  //     alert(error);
-  //   })
-  // };
-
   const loadPosts = async () => {
     setIsLoading(true);
     firebase
@@ -85,10 +67,9 @@ const HomeScreen = (props) => {
               refreshing={Render}
               renderItem={function ({ item }) {
                 return (
-                  <ShowPostComponent postBody={item} />
+                  <ShowPostComponent postBody={item} LocalUser={auth.CurrentUser.displayName} nav={props} />
                 );
               }}
-            // keyExtractor={(item, index) => index.toString()}
             />
             }
 
