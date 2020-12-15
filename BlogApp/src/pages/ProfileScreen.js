@@ -6,48 +6,62 @@ import { getDataJson, getAllindex, removeData } from '../functions/AsyncstorageF
 import PostlistComponent from "../components/PostListComponent";
 import { AuthContext } from "../provider/AuthProvider";
 import HeaderHome from "../components/HeaderComponent";
+import ShowPostComponent from "../components/ShowPostComponent";
+import * as firebase from "firebase";
+import 'firebase/firestore';
 
 
 const ProfileScreen = (props) => {
 
   const [Post, setPost] = useState([]);
+  const [Profiles, setProfiles] = useState([]);
   const [Render, setRender] = useState(false);
 
-  const deleteprofile = async (name, email) => {
-    let flag = false
-    let index = await getAllindex();
-    if (index != null) {
-      for (let i of index) {
-        if (i.endsWith(name)) {
-          await removeData((i));
-        }
+  const getData = async () => {
+    firebase
+      .firestore()
+      .collection("users")
+      .onSnapshot((querySnapshot) => {
+        let temp_users = [];
+        querySnapshot.forEach((doc) => {
+          temp_users.push({
+            id: doc.id,
+            data: doc.data(),
+          });
+        });
+        setProfiles(temp_users);
+        //setLoading(false);
       }
-    }
-    await removeData((email));
-    return flag;
+        , (error) => {
+          //setLoading(false);
+          alert(error);
+        });
   }
-
   const getPost = async () => {
-    setRender(true);
-    let keys = await getAllindex();
-    let Allposts = [];
-    if (keys != null) {
-      for (let k of keys) {
-        if (k.startsWith("pid#")) {
-          let post = await getDataJson(k);
-          Allposts.push(post);
-        }
+    firebase
+      .firestore()
+      .collection("posts")
+      .orderBy("posted_at", "desc")
+      .onSnapshot((querySnapshot) => {
+        let temp_users = [];
+        querySnapshot.forEach((doc) => {
+          temp_users.push({
+            id: doc.id,
+            data: doc.data(),
+          });
+        });
+        setPost(temp_users);
+        //setLoading(false);
       }
-      setPost(Allposts);
-    }
-    else {
-      console.log("No post to show");
-    }
-    setRender(false);
+        , (error) => {
+          //setLoading(false);
+          alert(error);
+        });
   }
 
   useEffect(() => {
     getPost();
+    getData();
   }, []);
 
   return (
@@ -56,7 +70,7 @@ const ProfileScreen = (props) => {
       {(auth) => (
         <View style={styles.viewStyle}>
           <HeaderHome
-            user={auth.CurrentUser.name}
+            user={auth.CurrentUser.displayName}
             DrawerFunction={() => {
               props.navigation.toggleDrawer();
             }}
@@ -66,14 +80,14 @@ const ProfileScreen = (props) => {
           <ImageBackground source={require('./../../assets/BG1.jpg')} style={styles.imageStyle}>
             <Card>
               <Image style={styles.imageStyle1} source={require('./../../assets/User.jpg')} />
-              <Text style={styles.NameStyle}> {auth.CurrentUser.name}</Text>
+              <Text style={styles.NameStyle}> {auth.CurrentUser.displayName}</Text>
               <View style={{ flexDirection: "row", justifyContent: "space-evenly", marginBottom: 40 }}>
                 <Button
                   type="solid"
                   title=" Edit Account "
                   onPress={
                     function () {
-                      props.navigation.navigate('EditProfile');
+                      props.navigation.navigate('EditProfile', { title: auth.CurrentUser });
                     }
                   }
                 />
@@ -81,24 +95,40 @@ const ProfileScreen = (props) => {
                   type="solid"
                   title=" Delete Account "
                   onPress={async () => {
-                    let del = await deleteprofile(auth.CurrentUser.name, auth.CurrentUser.email);
-                    if (del == false) {
-                      alert("User Removed Successfully");
+                    firebase.auth().deleteUser(auth.CurrentUser.uid).then(() => {
+                      console.log('Successfully deleted user');
                       auth.setIsloggedIn(false);
                       auth.setCurrentUser({});
-                    }
-                    else {
-                      alert("Delete action unsuccessful");
-                    }
+                    }).catch((error) => {
+                      console.log('Error deleting user:', error);
+                    });
                   }
                   }
                 />
 
-
               </View>
-              <Text style={styles.textStyle1}>  Born On : {auth.CurrentUser.dateOfBirth}</Text>
-              <Text style={styles.textStyle1}>  Lives At : {auth.CurrentUser.address}</Text>
-              <Text style={styles.textStyle1}>  Works At : {auth.CurrentUser.workPlace}</Text>
+
+
+              <FlatList
+                data={Profiles}
+                renderItem={function ({ item }) {
+                  console.log(item);
+                  if (auth.CurrentUser.uid == item.id) {
+                    return (
+                      <View>
+                        <Text style={styles.textStyle1}>  Born On :  {item.data.dateOfBirth}</Text>
+                        <Text style={styles.textStyle1}>  Lives At :  {item.data.address}</Text>
+                        <Text style={styles.textStyle1}>  Works At :  {item.data.workPlace}</Text>
+                      </View>
+                    );
+                  }
+                }}
+              />
+
+
+            </Card>
+            <Card>
+              <Text style={{ fontSize: 18, color: 'dodgerblue', textAlign: 'center' }}>↓ ↓ ↓ Your Posts ↓ ↓ ↓</Text>
             </Card>
 
             <FlatList
@@ -106,10 +136,10 @@ const ProfileScreen = (props) => {
               onRefresh={getPost}
               refreshing={Render}
               renderItem={function ({ item }) {
-                if (item.uname == auth.CurrentUser.name) {
+                console.log(item);
+                if (item.data.userId == auth.CurrentUser.uid) {
                   return (
-                    <PostlistComponent title={item} user={auth.CurrentUser}
-                    />
+                    <ShowPostComponent postBody={item} LocalUser={auth.CurrentUser.displayName} nav={props} />
                   );
                 }
               }}

@@ -5,6 +5,8 @@ import { FontAwesome5 } from '@expo/vector-icons';
 import { storeDataJson, mergeData, removeData } from '../functions/AsyncstorageFunction';
 import { AuthContext } from "../provider/AuthProvider";
 import HeaderHome from "../components/HeaderComponent";
+import * as firebase from "firebase";
+import 'firebase/firestore';
 
 const EditProfileScreen = (props) => {
   const [Bornon, setBornon] = useState("");
@@ -60,12 +62,22 @@ const EditProfileScreen = (props) => {
                 icon={<FontAwesome5 name="user-edit" size={24} color="white" />}
                 onPress={
                   async function () {
-                    await mergeData(auth.CurrentUser.email, JSON.stringify({
-                      dateOfBirth: Bornon,
-                      address: Livesat,
-                      workPlace: Worksat,
-                    }))
-                    alert("Relog in to see the update");
+                    firebase
+                      .firestore()
+                      .collection("users")
+                      .doc(auth.CurrentUser.uid)
+                      .update({
+                        dateOfBirth: Bornon,
+                        address: Livesat,
+                        workPlace: Worksat,
+                      })
+                      .catch((error) => {
+                        //setLoading(false);
+                        alert(error);
+                      });
+
+
+                    props.navigation.navigate('Profile');
                   }
                 }
               />

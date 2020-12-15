@@ -66,7 +66,6 @@ const NotificationComponent = (props) => {
             );
           }
           }
-          keyExtractor={(item, index) => index.toString()}
         />
 
       </Card>
