@@ -23,7 +23,7 @@ const storeDataJson =async(key, value) => {
 const getData = async (key) => {
     try{
         const data =await AsyncStorage.getItem(key);
-        if (data!=null) {
+        if (data!==null) {
             alert(data);
         } else {
             alert("No data assigned to the key");
@@ -36,7 +36,7 @@ const getData = async (key) => {
 const getDataJson = async (key) => {
     try {
       let data = await AsyncStorage.getItem(key);
-      if (data != null) {
+      if (data !== null) {
         const jsonData = JSON.parse(data);
         return jsonData;
       } else {
