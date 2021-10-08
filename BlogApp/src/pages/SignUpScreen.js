@@ -15,8 +15,48 @@ const SignupScreen = (props) => {
     const [Address, setAddress] = useState("");
     const [WorkPlace, setWorkPlace] = useState("");
     const [isLoading, setIsLoading] = useState(false);
+    // use ternary operator
+    const validateUser = async () => {
+        (Name && DoB && Email && Password && Address && WorkPlace) ?
+        setIsLoading(true).then(() => {
+            firebase
+            .auth()
+            .createUserWithEmailAndPassword(Email, Password)
+            .then((userCreds) => {
+                userCreds.user.updateProfile({ displayName: Name });
+                firebase
+                    .firestore()
+                    .collection("users")
+                    .doc(userCreds.user.uid)
+                    .set({
+                        name: Name,
+                        email: Email,
+                        dateOfBirth: DoB,
+                        address: Address,
+                        workPlace: WorkPlace,
+                    })
+                    .then(() => {
+                        setIsLoading(false)
+                        alert("Account created successfully! \nUID: " + userCreds.user.uid);
+                        props.navigation.navigate("SignIn");
+                    })
+                    .catch((error) => {
+                        setIsLoading(false)
+                        alert(error);
+                    });
+            })
+            .catch((error) => {
+                setIsLoading(false)
+                alert(error);
+            })
+        })  
+       :
+            alert("Fields can not be empty!");
+        
+    }
 
-    isLoading ?
+    return (
+    isLoading ? 
          (<Loading />)
     :
          (
@@ -85,44 +125,7 @@ const SignupScreen = (props) => {
                             icon={<Ionicons name="md-person-add" size={24} color="white" />}
                             title="  Sign Up"
                             type="solid"
-                            onPress={() => {
-                                if (Name && DoB && Email && Password && Address && WorkPlace) {
-                                    setIsLoading(true)
-                                    firebase
-                                        .auth()
-                                        .createUserWithEmailAndPassword(Email, Password)
-                                        .then((userCreds) => {
-                                            userCreds.user.updateProfile({ displayName: Name });
-                                            firebase
-                                                .firestore()
-                                                .collection("users")
-                                                .doc(userCreds.user.uid)
-                                                .set({
-                                                    name: Name,
-                                                    email: Email,
-                                                    dateOfBirth: DoB,
-                                                    address: Address,
-                                                    workPlace: WorkPlace,
-                                                })
-                                                .then(() => {
-                                                    setIsLoading(false)
-                                                    alert("Account created successfully! \nUID: " + userCreds.user.uid);
-                                                    props.navigation.navigate("SignIn");
-                                                })
-                                                .catch((error) => {
-                                                    setIsLoading(false)
-                                                    alert(error);
-                                                });
-                                        })
-                                        .catch((error) => {
-                                            setIsLoading(false)
-                                            alert(error);
-                                        });
-                                } else {
-                                    alert("Fields can not be empty!");
-                                }
-                            }
-                            }
+                            onPress={this.validateUser}
                         />
 
                         <Button
@@ -140,7 +143,7 @@ const SignupScreen = (props) => {
                 </ImageBackground>
             </SafeAreaView>
         )
-    
+    )
 }
 
 const styles = StyleSheet.create({

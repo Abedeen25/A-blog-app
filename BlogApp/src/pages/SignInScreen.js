@@ -14,9 +14,8 @@ const SigninScreen = (props) => {
     const [Password, setPassword] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    if (isLoading) { return (<Loading />) }
-    else {
         return (
+            isLoading ? <Loading /> : 
             <AuthContext.Consumer>
                 {(auth) => (
                     <SafeAreaView style={styles.viewStyle}>
@@ -91,7 +90,7 @@ const SigninScreen = (props) => {
                 )}
             </AuthContext.Consumer>
         )
-    }
+    
 }
 
 const styles = StyleSheet.create({
