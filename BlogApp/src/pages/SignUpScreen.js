@@ -16,10 +16,10 @@ const SignupScreen = (props) => {
     const [WorkPlace, setWorkPlace] = useState("");
     const [isLoading, setIsLoading] = useState(false);
 
-    if (isLoading) {
-        return (<Loading />)
-    } else {
-        return (
+    isLoading ?
+         (<Loading />)
+    :
+         (
             <SafeAreaView style={styles.viewStyle}>
                 <ImageBackground source={require('./../../assets/BG1.jpg')} style={styles.imageStyle}>
                     <Card>
@@ -140,7 +140,7 @@ const SignupScreen = (props) => {
                 </ImageBackground>
             </SafeAreaView>
         )
-    }
+    
 }
 
 const styles = StyleSheet.create({
